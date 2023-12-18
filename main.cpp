@@ -40,9 +40,8 @@ public:
         info_file >> ret.available;
         ret.available *= 1000;
 
-        for (size_t i = 0; i < 2 && info_file; ++i) {
-            info_file.ignore(std::numeric_limits<std::streamsize>::max(), ':');
-        }
+        info_file.ignore(std::numeric_limits<std::streamsize>::max(), ':');
+        info_file.ignore(std::numeric_limits<std::streamsize>::max(), ':');
         info_file >> ret.cached;
         ret.cached *= 1000;
 
