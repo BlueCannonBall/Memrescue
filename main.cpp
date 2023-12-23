@@ -1,6 +1,7 @@
 #include "manager.hpp"
 #include <chrono>
 #include <cstddef>
+#include <cstdlib>
 #include <string>
 #include <sys/mman.h>
 #include <sys/swap.h>
@@ -11,8 +12,8 @@ int main() {
     mlockall(MCL_CURRENT);
     mlockall(MCL_FUTURE);
     ResourceManager manager;
-
     manager.write_message("membomber", "membomber is running");
+
     for (;;) {
         CPUStats start_cpu_stats = manager.cpu_stats();
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
