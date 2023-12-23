@@ -30,8 +30,10 @@ int main() {
                 } else {
                     manager.write_message("membomber", "Killed process " + std::to_string(result));
                 }
+                continue;
             }
-        } else if (iowait_percentage > 0.25) {
+        }
+        if (iowait_percentage > 0.25) {
             manager.write_message("membomber", "Dropping caches...");
             manager.drop_caches();
             manager.write_message("membomber", "Caches dropped");
