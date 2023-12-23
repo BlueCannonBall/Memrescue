@@ -43,13 +43,15 @@ protected:
     std::ifstream info_file;
     std::ifstream swap_info_file;
     std::ofstream drop_caches_file;
+    std::ofstream kmsg_file;
 
 public:
     ResourceManager():
         cpu_stats_file("/proc/stat"),
         info_file("/proc/meminfo"),
         swap_info_file("/proc/swaps"),
-        drop_caches_file("/proc/sys/vm/drop_caches") {}
+        drop_caches_file("/proc/sys/vm/drop_caches"),
+        kmsg_file("/dev/kmsg") {}
 
     CPUStats cpu_stats();
     MemoryInfo info();
@@ -58,5 +60,9 @@ public:
 
     inline void drop_caches() {
         drop_caches_file << 3;
+    }
+
+    inline void write_message(const std::string& heading, const std::string& message) {
+        kmsg_file << heading << ": " << message << std::endl;
     }
 };
