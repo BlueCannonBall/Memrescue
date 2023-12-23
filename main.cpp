@@ -21,9 +21,11 @@ int main() {
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
         CPUStats end_cpu_stats = manager.cpu_stats();
 
+        MemoryInfo info;
         double iowait_percentage = (double) (end_cpu_stats.iowait_time - start_cpu_stats.iowait_time) / (end_cpu_stats.total_time - start_cpu_stats.total_time);
         if (iowait_percentage > 0.125) {
-            MemoryInfo info = manager.info();
+            info = manager.info();
+
             if (info.available < info.total / 15) {
                 manager.write_message("membomber", "Killing highest-OOM-score process...");
                 pid_t result;
@@ -34,13 +36,15 @@ int main() {
                 }
                 continue;
             }
+
+            if (info.cached) {
+                manager.write_message("membomber", "Dropping caches...");
+                manager.drop_caches();
+                manager.write_message("membomber", "Caches dropped");
+                continue;
+            }
         }
         if (iowait_percentage > 0.25) {
-            manager.write_message("membomber", "Dropping caches...");
-            manager.drop_caches();
-            manager.write_message("membomber", "Caches dropped");
-
-            MemoryInfo info = manager.info();
             if (info.total_swap &&
                 info.free_swap < info.total_swap &&
                 info.available > info.total_swap - info.free_swap) {

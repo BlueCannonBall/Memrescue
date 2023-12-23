@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sys/types.h>
+#include <unistd.h>
 #include <utility>
 #include <vector>
 
@@ -61,6 +62,7 @@ public:
     static pid_t oom_kill();
 
     inline void drop_caches() {
+        sync();
         drop_caches_file << 3;
     }
 
