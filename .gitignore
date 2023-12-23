@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Custom
+obj/
+membomber
+compile_commands.json
+.cache/
