@@ -22,7 +22,7 @@ int main() {
         double iowait_percentage = (double) (end_cpu_stats.iowait_time - start_cpu_stats.iowait_time) / (end_cpu_stats.total_time - start_cpu_stats.total_time);
         if (iowait_percentage > 0.125) {
             MemoryInfo info = manager.info();
-            if (info.available < info.total / 10) {
+            if (info.available < info.total / 15) {
                 manager.write_message("membomber", "Killing highest-OOM-score process...");
                 pid_t result;
                 if ((result = ResourceManager::oom_kill()) == -1) {
