@@ -39,7 +39,9 @@ int main() {
             manager.write_message("membomber", "Caches dropped");
 
             MemoryInfo info = manager.info();
-            if (info.total_swap && info.available > info.total_swap - info.free_swap) {
+            if (info.total_swap &&
+                info.free_swap < info.total_swap &&
+                info.available > info.total_swap - info.free_swap) {
                 manager.write_message("membomber", "Clearing swap...");
                 std::vector<SwapInfo> swap_info = manager.swap_info();
                 for (const auto& entry : swap_info) {
