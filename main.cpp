@@ -6,12 +6,14 @@
 #include <sys/mman.h>
 #include <sys/swap.h>
 #include <thread>
+#include <unistd.h>
 #include <vector>
 
 int main() {
     mlockall(MCL_CURRENT);
     mlockall(MCL_FUTURE);
     ResourceManager manager;
+    manager.adjust_oom_score(getpid(), -1000);
     manager.write_message("membomber", "membomber is running");
 
     for (;;) {

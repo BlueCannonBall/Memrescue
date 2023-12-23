@@ -100,6 +100,14 @@ std::vector<SwapInfo> ResourceManager::swap_info() {
     return ret;
 }
 
+void ResourceManager::adjust_oom_score(pid_t pid, int adjustment) {
+    std::ofstream file("/proc/" + std::to_string(pid) + "/oom_score_adj");
+    file << adjustment;
+    if (!file && !file.eof()) {
+        throw std::runtime_error("Failed to write to /proc/" + std::to_string(pid) + "/oom_score_adj");
+    }
+}
+
 pid_t ResourceManager::oom_kill() {
     std::unordered_map<pid_t, int> oom_scores;
 

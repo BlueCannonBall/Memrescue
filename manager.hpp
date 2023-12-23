@@ -56,6 +56,8 @@ public:
     CPUStats cpu_stats();
     MemoryInfo info();
     std::vector<SwapInfo> swap_info();
+
+    static void adjust_oom_score(pid_t pid, int adjustment);
     static pid_t oom_kill();
 
     inline void drop_caches() {
