@@ -3,8 +3,10 @@
 #include <cctype>
 #include <filesystem>
 #include <limits>
+#include <sched.h>
 #include <signal.h>
 #include <stdexcept>
+#include <sys/swap.h>
 #include <unordered_map>
 
 CPUStats ResourceManager::cpu_stats() {
@@ -100,6 +102,42 @@ std::vector<SwapInfo> ResourceManager::swap_info() {
     return ret;
 }
 
+void ResourceManager::drop_caches() {
+    log("Dropping caches...");
+    sync();
+    drop_caches_file << 3;
+    log("Caches dropped");
+
+    std::time(&clears.cache);
+}
+
+void ResourceManager::clear_swap() {
+    log("Clearing swap...");
+    auto info = swap_info();
+    for (const auto& entry : info) {
+        swapoff(entry.filename.c_str());
+    }
+    for (const auto& entry : info) {
+        swapon(entry.filename.c_str(), (entry.priority << SWAP_FLAG_PRIO_SHIFT) & SWAP_FLAG_PRIO_MASK);
+    }
+    log("Swap cleared");
+
+    std::time(&clears.swap);
+}
+
+void ResourceManager::kill_proc(pid_t pid) {
+    pid_t result;
+
+    log("Killing highest-OOM-score process...");
+    if ((result = kill(pid, SIGKILL)) == -1) {
+        log("Error: Failed to kill process " + std::to_string(result));
+    } else {
+        log("Killed process " + std::to_string(result));
+    }
+
+    std::time(&clears.kill);
+}
+
 void ResourceManager::adjust_oom_score(pid_t pid, int adjustment) {
     std::ofstream file("/proc/" + std::to_string(pid) + "/oom_score_adj");
     file << adjustment;
@@ -108,7 +146,7 @@ void ResourceManager::adjust_oom_score(pid_t pid, int adjustment) {
     }
 }
 
-pid_t ResourceManager::oom_kill() {
+ProcessInfo ResourceManager::get_hightest() {
     std::unordered_map<pid_t, int> oom_scores;
 
     for (const auto& entry : std::filesystem::directory_iterator("/proc")) {
@@ -134,8 +172,9 @@ pid_t ResourceManager::oom_kill() {
     pid_t pid = std::max_element(oom_scores.begin(), oom_scores.end(), [](const auto& a, const auto& b) {
         return a.second < b.second;
     })->first;
-    if (kill(pid, SIGKILL) == -1) {
-        return -1;
-    }
-    return pid;
+
+    return {
+        pid,
+        oom_scores[pid],
+    };
 }

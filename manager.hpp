@@ -1,6 +1,8 @@
 #include "./config.hpp"
 #include <cstddef>
 #include <fstream>
+#include <iostream>
+#include <sched.h>
 #include <string>
 #include <sys/types.h>
 #include <unistd.h>
@@ -38,6 +40,11 @@ struct SwapInfo {
     int priority;
 };
 
+struct ProcessInfo {
+    pid_t pid;
+    int oom_score;
+};
+
 class ResourceManager {
 protected:
     std::ifstream cpu_stats_file;
@@ -47,6 +54,12 @@ protected:
     std::ofstream log_file;
 
 public:
+    struct {
+        time_t cache = 0;
+        time_t swap = 0;
+        time_t kill = 0;
+    } clears;
+
     ResourceManager():
         cpu_stats_file("/proc/stat"),
         info_file("/proc/meminfo"),
@@ -58,15 +71,21 @@ public:
     MemoryInfo info();
     std::vector<SwapInfo> swap_info();
 
-    static void adjust_oom_score(pid_t pid, int adjustment);
-    static pid_t oom_kill();
+    void drop_caches(void);
+    void clear_swap(void);
+    void kill_proc(pid_t pid);
 
-    inline void drop_caches() {
-        sync();
-        drop_caches_file << 3;
-    }
+    static void adjust_oom_score(pid_t pid, int adjustment);
+    static ProcessInfo get_hightest();
 
     inline void write_message(const std::string& heading, const std::string& message) {
+#ifdef DEBUG
+        std::cout << heading << ": " << message << std::endl;
+#else
         log_file << heading << ": " << message << std::endl;
+#endif
+    }
+    inline void log(const std::string& message) {
+        write_message("membomber", message);
     }
 };
