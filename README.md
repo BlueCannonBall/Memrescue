@@ -23,4 +23,4 @@ $ sudo memrescue
 ```
 
 ## Configuring Memrescue
-You can edit any functionality in config.hpp, however you will need to compile Memrescue again.
+You can edit any of the options in `config.hpp`. However, you will need to compile Memrescue again.
