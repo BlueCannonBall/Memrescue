@@ -89,6 +89,6 @@ public:
     }
 
     inline void log(const std::string& message) {
-        log("Memrescue", message);
+        log("memrescue", message);
     }
 };
