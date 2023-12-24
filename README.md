@@ -7,17 +7,17 @@ $ make
 $ sudo make install
 ```
 
-## Set up with systemctl
+## Set up with systemd
 ```sh
 $ sudo make start
 ```
 
-## Update systemctl after recompile
+## Update systemd after recompile
 ```sh
 $ sudo make update
 ```
 
-## Stop systemctl and uninstall
+## Stop systemd and uninstall
 ```sh
 $ sudo make remove
 ```
