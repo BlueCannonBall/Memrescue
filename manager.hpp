@@ -1,9 +1,9 @@
+#include "./config.hpp"
 #include <cstddef>
 #include <fstream>
 #include <string>
 #include <sys/types.h>
 #include <unistd.h>
-#include <utility>
 #include <vector>
 
 struct CPUStats {
@@ -44,7 +44,7 @@ protected:
     std::ifstream info_file;
     std::ifstream swap_info_file;
     std::ofstream drop_caches_file;
-    std::ofstream kmsg_file;
+    std::ofstream log_file;
 
 public:
     ResourceManager():
@@ -52,7 +52,7 @@ public:
         info_file("/proc/meminfo"),
         swap_info_file("/proc/swaps"),
         drop_caches_file("/proc/sys/vm/drop_caches"),
-        kmsg_file("/dev/kmsg") {}
+        log_file(LOG_FILE) {}
 
     CPUStats cpu_stats();
     MemoryInfo info();
@@ -67,6 +67,6 @@ public:
     }
 
     inline void write_message(const std::string& heading, const std::string& message) {
-        kmsg_file << heading << ": " << message << std::endl;
+        log_file << heading << ": " << message << std::endl;
     }
 };

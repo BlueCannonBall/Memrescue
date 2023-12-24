@@ -1,7 +1,6 @@
+#include "./config.hpp"
 #include "manager.hpp"
 #include <chrono>
-#include <cstddef>
-#include <cstdlib>
 #include <string>
 #include <sys/mman.h>
 #include <sys/swap.h>
@@ -18,7 +17,7 @@ int main() {
 
     for (;;) {
         CPUStats start_cpu_stats = manager.cpu_stats();
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
         CPUStats end_cpu_stats = manager.cpu_stats();
         MemoryInfo memory_info = manager.info();
 
@@ -42,6 +41,7 @@ int main() {
                 continue;
             }
         }
+
         if (iowait_percentage > 0.25) {
             if (memory_info.total_swap &&
                 memory_info.free_swap < memory_info.total_swap &&
