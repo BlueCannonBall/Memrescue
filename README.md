@@ -17,6 +17,11 @@ $ sudo make start
 $ sudo make update
 ```
 
+## Stop systemctl and uninstall
+```sh
+$ sudo make remove
+```
+
 ## Command usage
 ```sh
 $ sudo memrescue
