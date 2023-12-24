@@ -1,5 +1,4 @@
 #include "manager.hpp"
-#include <algorithm>
 #include <cctype>
 #include <filesystem>
 #include <limits>
@@ -7,7 +6,6 @@
 #include <stdexcept>
 #include <sys/swap.h>
 #include <unistd.h>
-#include <unordered_map>
 #include <utility>
 
 CPUStats ResourceManager::cpu_stats() {
@@ -152,7 +150,7 @@ void ResourceManager::adjust_niceness(int adjustment) {
     }
 }
 
-ProcessInfo ResourceManager::get_highest() {
+std::unordered_map<pid_t, int> ResourceManager::get_oom_scores() {
     std::unordered_map<pid_t, int> oom_scores;
 
     for (const auto& entry : std::filesystem::directory_iterator("/proc")) {
@@ -175,11 +173,5 @@ ProcessInfo ResourceManager::get_highest() {
     next_entry:;
     }
 
-    pid_t pid = std::max_element(oom_scores.begin(), oom_scores.end(), [](const auto& a, const auto& b) {
-        return a.second < b.second;
-    })->first;
-    return {
-        pid,
-        oom_scores[pid],
-    };
+    return oom_scores;
 }

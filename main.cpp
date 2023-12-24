@@ -1,5 +1,6 @@
 #include "config.hpp"
 #include "manager.hpp"
+#include <algorithm>
 #include <chrono>
 #include <stdexcept>
 #include <string>
@@ -32,7 +33,12 @@ int main() {
 
         if (iowait_percentage > IOWAIT_THRES) {
             if (memory_percentage > MAX_MEMORY_USAGE) {
-                manager.kill_process(manager.get_highest().pid);
+                auto oom_scores = manager.get_oom_scores();
+                do {
+                    manager.kill_process(std::max_element(oom_scores.begin(), oom_scores.end(), [](const auto& a, const auto& b) {
+                        return a.second < b.second;
+                    })->first);
+                } while (memory_percentage > MAX_MEMORY_USAGE);
 
                 if (now - manager.clears.cache > std::chrono::milliseconds(CACHE_TIMEOUT) && memory_info.cached) {
                     manager.drop_caches();

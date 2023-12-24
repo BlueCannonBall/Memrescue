@@ -8,6 +8,7 @@
 #include <string>
 #include <sys/types.h>
 #include <unistd.h>
+#include <unordered_map>
 #include <vector>
 
 struct CPUStats {
@@ -42,11 +43,6 @@ struct SwapInfo {
     int priority;
 };
 
-struct ProcessInfo {
-    pid_t pid;
-    int oom_score;
-};
-
 class ResourceManager {
 protected:
     std::ifstream cpu_stats_file;
@@ -78,7 +74,7 @@ public:
 
     static void adjust_oom_score(pid_t pid, int adjustment);
     static void adjust_niceness(int adjustment);
-    static ProcessInfo get_highest();
+    static std::unordered_map<pid_t, int> get_oom_scores();
 
     inline void log(const std::string& heading, const std::string& message) {
 #ifdef DEBUG
