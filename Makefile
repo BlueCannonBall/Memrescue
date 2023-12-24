@@ -4,17 +4,16 @@ HEADERS = $(shell find . -name "*.hpp")
 OBJDIR = obj
 OBJS = $(OBJDIR)/main.o $(OBJDIR)/manager.o
 TARGET = memrescue
-PROGRAM_NAME = Memrescue
-INSTALL_DIR = /usr/local/bin
-SERVICE_DIR = /etc/systemd/system
+NAME = Memrescue
+PREFIX = /usr/local
+SERVICEDIR = /etc/systemd/system
 
 define SERVICE_CONTENT
 [Unit]
-Description=$(PROGRAM_NAME) Service
-After=network.target
+Description=$(NAME) Service
 
 [Service]
-ExecStart=sudo $(TARGET)
+ExecStart=$(TARGET)
 Restart=always
 User=root
 
@@ -34,27 +33,24 @@ $(OBJDIR)/manager.o: manager.cpp manager.hpp
 	mkdir -p $(OBJDIR)
 	$(CXX) -c $< $(CXXFLAGS) -o $@
 
-.PHONY: clean install
+.PHONY: clean install uninstall update
 
 clean:
 	rm -rf $(TARGET) $(OBJDIR)
 
 install:
-	cp $(TARGET) $(INSTALL_DIR)
-	@echo "$$SERVICE_CONTENT" > "$(SERVICE_DIR)/$(TARGET).service"
-
-start:
+	cp $(TARGET) $(PREFIX)/bin/
+	@echo "$$SERVICE_CONTENT" > $(SERVICEDIR)/$(TARGET).service
 	systemctl daemon-reload
-	systemctl start $(TARGET) --now
 
-remove:
-	systemctl stop $(TARGET)
-	systemctl disable $(TARGET) --now
-	rm $(INSTALL_DIR)/$(TARGET)
-	rm "$(SERVICE_DIR)/$(TARGET).service"
+uninstall:
+	rm $(PREFIX)/bin/$(TARGET)
+	rm $(SERVICEDIR)/$(TARGET).service
+	systemctl disable memrescue --now
+	systemctl daemon-reload
 
 update:
 	systemctl stop $(TARGET)
-	cp $(TARGET) $(INSTALL_DIR)
+	$(MAKE) install
 	systemctl daemon-reload
 	systemctl start $(TARGET)

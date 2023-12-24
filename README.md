@@ -2,27 +2,27 @@
 Memrescue keeps your Linux desktop fast and responsive by proactively killing programs using too much memory and clearing swap/caches as needed.
 
 ## Installation
+You can install Memrescue using make:
 ```sh
 $ make
 $ sudo make install
 ```
-
-## Set up with systemd
+Then, you can make it start on boot with systemd:
 ```sh
-$ sudo make start
+$ systemctl enable memrescue # Add --now to also start it immediately
 ```
 
-## Update systemd after recompile
+## Uninstallation
+You can uninstall Memrescue using make:
 ```sh
-$ sudo make update
+$ sudo make uninstall
 ```
+This will also disable and stop `memrescue.service`.
 
-## Stop systemd and uninstall
-```sh
-$ sudo make remove
-```
+## Updating
+If you enabled `memrescue.service`, update with `sudo make update` to recompile Memrescue and restart the service. Otherwise, use `sudo make install`.
 
-## Command usage
+## Usage
 ```sh
 $ sudo memrescue
 ```
