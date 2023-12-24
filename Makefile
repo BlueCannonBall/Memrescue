@@ -62,4 +62,4 @@ update:
 	cp $(TARGET) $(INSTALL_DIR)
 	systemctl daemon-reload
 	systemctl start $(TARGET)
-	@echo "Updated $(tARGET)"
+	@echo "Updated $(TARGET)"
