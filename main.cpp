@@ -35,9 +35,11 @@ int main() {
             if (memory_percentage > MAX_MEMORY_USAGE) {
                 auto oom_scores = manager.get_oom_scores();
                 do {
-                    manager.kill_process(std::max_element(oom_scores.begin(), oom_scores.end(), [](const auto& a, const auto& b) {
+                    auto highest_process = std::max_element(oom_scores.begin(), oom_scores.end(), [](const auto& a, const auto& b) {
                         return a.second < b.second;
-                    })->first);
+                    });
+                    manager.kill_process(highest_process->first);
+                    oom_scores.erase(highest_process);
                 } while (memory_percentage > MAX_MEMORY_USAGE);
 
                 if (now - manager.clears.cache > std::chrono::milliseconds(CACHE_TIMEOUT) && memory_info.cached) {

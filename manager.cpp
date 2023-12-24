@@ -129,7 +129,7 @@ void ResourceManager::clear_swap() {
 
 void ResourceManager::kill_process(pid_t pid) {
     pid_t result;
-    log("Killing the highest-OOM-score process...");
+    log("Killing process " + std::to_string(pid) + "...");
     if ((result = kill(pid, SIGKILL)) == -1) {
         log("Error: Failed to kill process " + std::to_string(pid));
     } else {
