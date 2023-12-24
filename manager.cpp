@@ -3,11 +3,12 @@
 #include <cctype>
 #include <filesystem>
 #include <limits>
-#include <sched.h>
 #include <signal.h>
 #include <stdexcept>
 #include <sys/swap.h>
+#include <unistd.h>
 #include <unordered_map>
+#include <utility>
 
 CPUStats ResourceManager::cpu_stats() {
     CPUStats ret;
@@ -105,10 +106,13 @@ std::vector<SwapInfo> ResourceManager::swap_info() {
 void ResourceManager::drop_caches() {
     log("Dropping caches...");
     sync();
-    drop_caches_file << 3;
-    log("Caches dropped");
+    if (drop_caches_file << 3) {
+        log("Caches dropped");
+    } else {
+        log("Failed to drop caches");
+    }
 
-    std::time(&clears.cache);
+    clears.cache = std::chrono::steady_clock::now();
 }
 
 void ResourceManager::clear_swap() {
@@ -122,31 +126,33 @@ void ResourceManager::clear_swap() {
     }
     log("Swap cleared");
 
-    std::time(&clears.swap);
+    clears.swap = std::chrono::steady_clock::now();
 }
 
-void ResourceManager::kill_proc(pid_t pid) {
+void ResourceManager::kill_process(pid_t pid) {
     pid_t result;
-
     log("Killing the highest-OOM-score process...");
     if ((result = kill(pid, SIGKILL)) == -1) {
         log("Error: Failed to kill process " + std::to_string(pid));
     } else {
         log("Killed process " + std::to_string(pid));
     }
-
-    std::time(&clears.kill);
 }
 
 void ResourceManager::adjust_oom_score(pid_t pid, int adjustment) {
     std::ofstream file("/proc/" + std::to_string(pid) + "/oom_score_adj");
-    file << adjustment;
-    if (!file && !file.eof()) {
+    if (!(file << adjustment)) {
         throw std::runtime_error("Failed to write to /proc/" + std::to_string(pid) + "/oom_score_adj");
     }
 }
 
-ProcessInfo ResourceManager::get_hightest() {
+void ResourceManager::adjust_niceness(int adjustment) {
+    if (nice(adjustment) == -1) {
+        throw std::runtime_error("Failed to adjust niceness");
+    }
+}
+
+ProcessInfo ResourceManager::get_highest() {
     std::unordered_map<pid_t, int> oom_scores;
 
     for (const auto& entry : std::filesystem::directory_iterator("/proc")) {
@@ -172,7 +178,6 @@ ProcessInfo ResourceManager::get_hightest() {
     pid_t pid = std::max_element(oom_scores.begin(), oom_scores.end(), [](const auto& a, const auto& b) {
         return a.second < b.second;
     })->first;
-
     return {
         pid,
         oom_scores[pid],

@@ -1,8 +1,10 @@
-#include "./config.hpp"
+#pragma once
+
+#include "config.hpp"
+#include <chrono>
 #include <cstddef>
 #include <fstream>
 #include <iostream>
-#include <sched.h>
 #include <string>
 #include <sys/types.h>
 #include <unistd.h>
@@ -55,9 +57,8 @@ protected:
 
 public:
     struct {
-        time_t cache = 0;
-        time_t swap = 0;
-        time_t kill = 0;
+        std::chrono::steady_clock::time_point cache;
+        std::chrono::steady_clock::time_point swap;
     } clears;
 
     ResourceManager():
@@ -73,19 +74,21 @@ public:
 
     void drop_caches(void);
     void clear_swap(void);
-    void kill_proc(pid_t pid);
+    void kill_process(pid_t pid);
 
     static void adjust_oom_score(pid_t pid, int adjustment);
-    static ProcessInfo get_hightest();
+    static void adjust_niceness(int adjustment);
+    static ProcessInfo get_highest();
 
-    inline void write_message(const std::string& heading, const std::string& message) {
+    inline void log(const std::string& heading, const std::string& message) {
 #ifdef DEBUG
         std::cout << heading << ": " << message << std::endl;
 #else
         log_file << heading << ": " << message << std::endl;
 #endif
     }
+
     inline void log(const std::string& message) {
-        write_message("membomber", message);
+        log("Memrescue", message);
     }
 };

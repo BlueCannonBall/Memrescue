@@ -3,8 +3,8 @@ CXXFLAGS = -Wall -std=c++17 -Ofast
 HEADERS = $(shell find . -name "*.hpp")
 OBJDIR = obj
 OBJS = $(OBJDIR)/main.o $(OBJDIR)/manager.o
-TARGET = membomber
-PROGRAM_NAME = Membomber
+TARGET = memrescue
+PROGRAM_NAME = Memrescue
 INSTALL_DIR = /usr/local/bin
 SERVICE_DIR = /etc/systemd/system
 
@@ -42,17 +42,14 @@ clean:
 install:
 	cp $(TARGET) $(INSTALL_DIR)
 	@echo "$$SERVICE_CONTENT" > "$(SERVICE_DIR)/$(TARGET).service"
-	@echo "Installed $(TARGET)"
 
 start:
 	systemctl daemon-reload
-	systemctl enable $(TARGET)
-	systemctl start $(TARGET)
-	@echo "Started $(TARGET) service with systemctl"
+	systemctl start $(TARGET) --now
 
 remove:
 	systemctl stop $(TARGET)
-	systemctl disable $(TARGET)
+	systemctl disable $(TARGET) --now
 	rm $(INSTALL_DIR)/$(TARGET)
 	rm "$(SERVICE_DIR)/$(TARGET).service"
 	@echo "Removed $(TARGET)"
@@ -62,4 +59,3 @@ update:
 	cp $(TARGET) $(INSTALL_DIR)
 	systemctl daemon-reload
 	systemctl start $(TARGET)
-	@echo "Updated $(TARGET)"

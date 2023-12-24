@@ -33,6 +33,6 @@
 
 # Custom
 obj/
-membomber
+memrescue
 compile_commands.json
 .cache/
