@@ -23,4 +23,10 @@ clean:
 	rm -rf $(TARGET) $(OBJDIR)
 
 install:
-	cp $(TARGET) $(PREFIX)/bin/
+	sh install.sh
+
+start:
+	sh start.sh
+
+update:
+	sh update.sh
