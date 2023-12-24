@@ -22,10 +22,10 @@ This will also disable and stop `memrescue.service`.
 ## Updating
 If you enabled `memrescue.service`, update with `sudo make update` to recompile Memrescue and restart the service. Otherwise, use `sudo make install`.
 
-## Usage
+## Usage (without systemd)
 ```sh
 $ sudo memrescue
 ```
 
 ## Configuring Memrescue
-You can edit any of the options in `config.hpp`. However, you will need to compile Memrescue again.
+You can edit any of the options in `config.hpp`. However, you will need to compile Memrescue again, as if you are updating it.
