@@ -52,7 +52,6 @@ remove:
 	systemctl disable $(TARGET) --now
 	rm $(INSTALL_DIR)/$(TARGET)
 	rm "$(SERVICE_DIR)/$(TARGET).service"
-	@echo "Removed $(TARGET)"
 
 update:
 	systemctl stop $(TARGET)
