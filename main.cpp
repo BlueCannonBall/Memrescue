@@ -39,6 +39,7 @@ int main() {
                 }
 
                 // Update memory info
+                std::this_thread::sleep_for(std::chrono::milliseconds(MEMORY_SLEEP_TIME));
                 memory_info = manager.info();
                 memory_percentage = 1. - (double) memory_info.available / memory_info.total;
 
@@ -50,9 +51,8 @@ int main() {
                     manager.kill_process(highest_process->first);
                     oom_scores.erase(highest_process);
 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(MEMORY_SLEEP_TIME));
-
                     // Update memory info
+                    std::this_thread::sleep_for(std::chrono::milliseconds(MEMORY_SLEEP_TIME));
                     memory_info = manager.info();
                     memory_percentage = 1. - (double) memory_info.available / memory_info.total;
                 }
