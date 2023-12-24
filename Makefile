@@ -42,13 +42,13 @@ clean:
 install:
 	cp $(TARGET) $(INSTALL_DIR)
 	@echo "$$SERVICE_CONTENT" > "$(SERVICE_DIR)/$(TARGET).service"
-	@echo "Installed $(TARGET)!"
+	@echo "Installed $(TARGET)"
 
 start:
 	systemctl daemon-reload
 	systemctl enable $(TARGET)
 	systemctl start $(TARGET)
-	@echo "Started $(TARGET) service with systemctl!"
+	@echo "Started $(TARGET) service with systemctl"
 
 remove:
 	systemctl stop $(TARGET)
@@ -62,3 +62,4 @@ update:
 	cp $(TARGET) $(INSTALL_DIR)
 	systemctl daemon-reload
 	systemctl start $(TARGET)
+	@echo "Updated $(tARGET)"
