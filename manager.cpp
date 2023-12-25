@@ -104,7 +104,7 @@ std::vector<SwapInfo> ResourceManager::swap_info() {
 void ResourceManager::drop_caches() {
     log("Dropping caches...");
     sync();
-    if (drop_caches_file << 3) {
+    if (drop_caches_file << 3 << std::endl) {
         log("Caches dropped");
     } else {
         log("Failed to drop caches");
@@ -139,7 +139,7 @@ void ResourceManager::kill_process(pid_t pid) {
 
 void ResourceManager::adjust_oom_score(pid_t pid, int adjustment) {
     std::ofstream file("/proc/" + std::to_string(pid) + "/oom_score_adj");
-    if (!(file << adjustment)) {
+    if (!(file << adjustment << std::endl)) {
         throw std::runtime_error("Failed to write to /proc/" + std::to_string(pid) + "/oom_score_adj");
     }
 }
