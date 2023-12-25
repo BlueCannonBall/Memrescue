@@ -52,5 +52,4 @@ uninstall:
 update:
 	systemctl stop $(TARGET)
 	$(MAKE) install
-	systemctl daemon-reload
 	systemctl start $(TARGET)
