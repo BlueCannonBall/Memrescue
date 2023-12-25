@@ -1,6 +1,5 @@
 #include "manager.hpp"
 #include <cctype>
-#include <filesystem>
 #include <limits>
 #include <signal.h>
 #include <stdexcept>
@@ -92,7 +91,7 @@ std::vector<SwapInfo> ResourceManager::swap_info() {
     swap_info_file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     for (SwapInfo entry; !swap_info_file.eof(); ret.push_back(std::move(entry))) {
-        swap_info_file >> entry.filename >> entry.type >> entry.size >> entry.usage >> entry.priority;
+        swap_info_file >> entry.path >> entry.type >> entry.size >> entry.usage >> entry.priority;
     }
 
     if (!swap_info_file && !swap_info_file.eof()) {
@@ -117,10 +116,10 @@ void ResourceManager::clear_swap() {
     log("Clearing swap...");
     auto info = swap_info();
     for (const auto& entry : info) {
-        swapoff(entry.filename.c_str());
+        swapoff(entry.path.c_str());
     }
     for (const auto& entry : info) {
-        swapon(entry.filename.c_str(), (entry.priority << SWAP_FLAG_PRIO_SHIFT) & SWAP_FLAG_PRIO_MASK);
+        swapon(entry.path.c_str(), (entry.priority << SWAP_FLAG_PRIO_SHIFT) & SWAP_FLAG_PRIO_MASK);
     }
     log("Swap cleared");
 

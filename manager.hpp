@@ -3,6 +3,7 @@
 #include "config.hpp"
 #include <chrono>
 #include <cstddef>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -35,7 +36,7 @@ struct MemoryInfo {
 };
 
 struct SwapInfo {
-    std::string filename;
+    std::filesystem::path path;
     std::string type;
     size_t size;
     size_t usage;
