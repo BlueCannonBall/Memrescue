@@ -43,13 +43,20 @@ int main() {
                 memory_info = manager.info();
                 memory_percentage = 1. - (double) memory_info.available / memory_info.total;
 
-                auto oom_scores = manager.get_oom_scores();
-                while (memory_percentage > MAX_MEMORY_USAGE && !oom_scores.empty()) {
-                    auto highest_process = std::max_element(oom_scores.begin(), oom_scores.end(), [](const auto& a, const auto& b) {
-                        return a.second < b.second;
+                auto processes = manager.get_processes();
+                std::sort(processes.begin(), processes.end(), [](const auto& a, const auto& b) {
+                    if (a.oom_score != b.oom_score) {
+                        return a.oom_score < b.oom_score;
+                    } else {
+                        return a.uss < b.uss;
+                    }
+                });
+                while (memory_percentage > MAX_MEMORY_USAGE && !processes.empty()) {
+                    auto highest_process = std::max_element(processes.end() - std::min<size_t>(OOM_KILLER_SAMPLE_SIZE, processes.size()), processes.end(), [](const auto& a, const auto& b) {
+                        return a.uss < b.uss;
                     });
-                    manager.kill_process(highest_process->first);
-                    oom_scores.erase(highest_process);
+                    manager.kill_process(highest_process->pid);
+                    processes.erase(highest_process);
 
                     // Update memory info
                     std::this_thread::sleep_for(std::chrono::milliseconds(MEMORY_SLEEP_TIME));

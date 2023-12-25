@@ -150,8 +150,8 @@ void ResourceManager::adjust_niceness(int adjustment) {
     }
 }
 
-std::unordered_map<pid_t, int> ResourceManager::get_oom_scores() {
-    std::unordered_map<pid_t, int> oom_scores;
+std::vector<ProcessInfo> ResourceManager::get_processes() {
+    std::vector<ProcessInfo> ret;
 
     for (const auto& entry : std::filesystem::directory_iterator("/proc")) {
         if (entry.is_directory()) {
@@ -162,16 +162,43 @@ std::unordered_map<pid_t, int> ResourceManager::get_oom_scores() {
                 }
             }
 
-            std::ifstream oom_score_file(entry.path() / "oom_score");
-            int oom_score;
-            oom_score_file >> oom_score;
+            size_t private_clean_memory;
+            size_t private_dirty_memory;
+            {
+                std::ifstream smaps_rollup_file(entry.path() / "smaps_rollup");
 
-            if (oom_score_file) {
-                oom_scores[std::stoi(filename)] = oom_score;
+                smaps_rollup_file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                for (size_t i = 0; i < 8; ++i) {
+                    smaps_rollup_file.ignore(std::numeric_limits<std::streamsize>::max(), ':');
+                }
+                smaps_rollup_file >> private_clean_memory;
+                private_clean_memory *= 1000;
+
+                smaps_rollup_file.ignore(std::numeric_limits<std::streamsize>::max(), ':');
+                smaps_rollup_file >> private_dirty_memory;
+                private_dirty_memory *= 1000;
+
+                if (!smaps_rollup_file && !smaps_rollup_file.eof()) {
+                    continue;
+                }
             }
+
+            int oom_score;
+            {
+                std::ifstream oom_score_file(entry.path() / "oom_score");
+                if (!(oom_score_file >> oom_score) && !oom_score_file.eof()) {
+                    continue;
+                }
+            }
+
+            ret.push_back({
+                std::stoi(filename),
+                private_clean_memory + private_dirty_memory,
+                oom_score,
+            });
         }
     next_entry:;
     }
 
-    return oom_scores;
+    return ret;
 }
