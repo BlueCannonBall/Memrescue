@@ -9,8 +9,7 @@
 
 int main() {
     // Prevent Memrescue's memory from being paged to the swap area
-    mlockall(MCL_CURRENT);
-    mlockall(MCL_FUTURE);
+    mlockall(MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT);
 
     ResourceManager manager;
     manager.adjust_oom_score(getpid(), -1000);
