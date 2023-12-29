@@ -4,13 +4,9 @@
 #include <chrono>
 #include <stdexcept>
 #include <string>
-#include <sys/mman.h>
 #include <thread>
 
 int main() {
-    // Prevent Memrescue's memory from being paged to the swap area
-    mlockall(MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT);
-
     ResourceManager manager;
     manager.adjust_oom_score(getpid(), -1000);
     manager.adjust_niceness(-20);
