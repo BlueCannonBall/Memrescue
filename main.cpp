@@ -2,8 +2,6 @@
 #include "manager.hpp"
 #include <algorithm>
 #include <chrono>
-#include <stdexcept>
-#include <string>
 #include <sys/mman.h>
 #include <thread>
 
