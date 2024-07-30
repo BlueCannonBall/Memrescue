@@ -8,6 +8,12 @@
 int main() {
     // Prevent Memrescue's memory from being paged to the swap area
     mlockall(MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT);
+    {
+        struct sched_param param = {
+            .sched_priority = sched_get_priority_max(SCHED_FIFO),
+        };
+        sched_setscheduler(getpid(), SCHED_FIFO, &param);
+    }
 
     ResourceManager manager;
     manager.adjust_oom_score(getpid(), -1000);
