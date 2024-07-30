@@ -82,7 +82,7 @@ public:
     static void adjust_niceness(int adjustment);
     static std::vector<ProcessInfo> get_processes();
 
-    inline void log(const std::string& heading, const std::string& message) {
+    inline void log(std::string_view heading, std::string_view message) {
 #ifdef DEBUG
         std::cout << heading << ": " << message << std::endl;
 #else
@@ -90,7 +90,7 @@ public:
 #endif
     }
 
-    inline void log(const std::string& message) {
+    inline void log(std::string_view message) {
         log("memrescue", message);
     }
 };
