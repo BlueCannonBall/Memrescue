@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
