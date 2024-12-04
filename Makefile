@@ -1,4 +1,3 @@
-CXX = g++
 CXXFLAGS = -Wall -std=c++17 -Os
 HEADERS = $(shell find . -name "*.hpp")
 OBJDIR = obj
