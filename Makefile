@@ -1,5 +1,5 @@
 CXXFLAGS = -Wall -std=c++17 -Os
-HEADERS = $(shell find . -name "*.hpp")
+HEADERS = $(shell find . -iname "*.hpp")
 OBJDIR = obj
 OBJS = $(OBJDIR)/main.o $(OBJDIR)/manager.o
 TARGET = memrescue
